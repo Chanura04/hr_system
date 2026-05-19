@@ -9,6 +9,7 @@ class SignificanceScorer:
             "policy",
             "manager",
             "meeting",
+            "schedule",
             "urgent",
             "compliance",
             "salary"

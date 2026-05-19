@@ -48,19 +48,25 @@ def get_audits(db: Session = Depends(get_db)):
 
 @router.get("/memory/{user_id}")
 def get_memory(user_id: str, db: Session = Depends(get_db)):
+    # Retrieve STM from the volatile storage
+    stm_content = orchestrator.memory_manager.stm.get(user_id)
+    
     records = db.query(LongTermMemoryRecord).filter(
         LongTermMemoryRecord.user_id == user_id
     ).order_by(LongTermMemoryRecord.created_at.desc()).all()
 
-    return [
-        {
-            "user_id": record.user_id,
-            "content": record.content,
-            "significance": record.significance,
-            "created_at": record.created_at.isoformat() if record.created_at else None,
-        }
-        for record in records
-    ]
+    return {
+        "user_id": user_id,
+        "short_term_memory": stm_content,
+        "long_term_memory": [
+            {
+                "content": record.content,
+                "significance": record.significance,
+                "created_at": record.created_at.isoformat() if record.created_at else None,
+            }
+            for record in records
+        ]
+    }
 
 
 @router.delete("/memory/{user_id}")

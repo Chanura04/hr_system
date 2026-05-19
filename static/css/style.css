@@ -117,3 +117,79 @@ button:hover {
 .error-card {
     border-left: 4px solid #ef4444;
 }
+
+.results-grid {
+    display: grid;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.hidden {
+    display: none;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.card-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+
+.value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.response-block {
+    border-left: 4px solid #4338ca;
+    background: #eff6ff;
+    padding: 18px 16px;
+    border-radius: 14px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+}
+
+.memory-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f8fafc;
+    margin-bottom: 12px;
+}
+
+.memory-meta {
+    font-size: 0.8rem;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.memory-group h3 {
+    margin-bottom: 10px;
+}

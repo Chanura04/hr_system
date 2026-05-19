@@ -17,60 +17,198 @@
         </div>
 
         <div class="card">
-            <form method="post" action="/submit">
-                <div class="grid">
-                    <div class="field">
-                        <label for="backend_url">Backend URL</label>
-                        <input id="backend_url" name="backend_url" type="text" value="{{ backend_url }}" placeholder="http://localhost:8000" />
-                    </div>
-                    <div class="field">
-                        <label for="user_id">User ID</label>
-                        <input id="user_id" name="user_id" type="text" value="{{ user_id }}" placeholder="user-123" />
-                    </div>
-                    <div class="field">
-                        <label for="message">Request Message</label>
-                        <textarea id="message" name="message" placeholder="I need to schedule a meeting with HR.">{{ message }}</textarea>
-                    </div>
+            <div class="grid">
+                <div class="field">
+                    <label for="backend_url">Backend URL</label>
+                    <input id="backend_url" name="backend_url" type="text" value="{{ backend_url }}" placeholder="http://localhost:8000" />
                 </div>
-                <div class="buttons">
-                    <button class="primary" type="submit">Submit Request</button>
-                    <button class="secondary" type="submit" formaction="/audit">Load Audit Log</button>
-                    <button class="secondary" type="submit" formaction="/memory">Load User Memory</button>
+                <div class="field">
+                    <label for="user_id">User ID</label>
+                    <input id="user_id" name="user_id" type="text" value="{{ user_id }}" placeholder="user-123" />
                 </div>
-            </form>
+                <div class="field">
+                    <label for="message">Request Message</label>
+                    <textarea id="message" name="message" placeholder="I need to schedule a meeting with HR.">{{ message }}</textarea>
+                </div>
+            </div>
+            <div class="buttons">
+                <button type="button" class="primary" onclick="handleAction(this, 'submit')">Submit Request</button>
+                <button type="button" class="secondary" onclick="handleAction(this, 'audit')">Load Audit Log</button>
+                <button type="button" class="secondary" onclick="handleAction(this, 'memory')">Load User Memory</button>
+            </div>
         </div>
 
-        {% if request_result %}
-        <div class="card">
-            <h2>Request Result</h2>
-            <div class="result">{{ request_result }}</div>
-        </div>
-        {% endif %}
+        <div class="results-grid">
+            <div id="error_section" class="card hidden">
+                <h2>Issue</h2>
+                <div id="error_content"></div>
+            </div>
 
-        {% if audit_result %}
-        <div class="card">
-            <h2>Audit Log</h2>
-            <div class="result">{{ audit_result }}</div>
-        </div>
-        {% endif %}
+            <div id="request_section" class="card hidden">
+                <h2>Latest Request Result</h2>
+                <div id="request_content"></div>
+            </div>
 
-        {% if memory_result %}
-        <div class="card">
-            <h2>User Memory</h2>
-            <div class="result">{{ memory_result }}</div>
-        </div>
-        {% endif %}
+            <div id="audit_section" class="card hidden">
+                <h2>Audit Trail</h2>
+                <div id="audit_content"></div>
+            </div>
 
-        {% if error_message %}
-        <div class="card error-card">
-            <h2>Error</h2>
-            <div class="result">{{ error_message }}</div>
+            <div id="memory_section" class="card hidden">
+                <h2>User Context (STM & LTM)</h2>
+                <div id="memory_content"></div>
+            </div>
         </div>
-        {% endif %}
 
         <div class="footer">
             Run the backend first with <code>python run.py</code> then launch this page with <code>python flask_app.py</code>.
         </div>
     </div>
+
+    <script>
+        async function handleAction(button, type) {
+            const backend_url = document.getElementById('backend_url').value;
+            const user_id = document.getElementById('user_id').value;
+            const message = document.getElementById('message').value;
+
+            updateError(null);
+            setLoading(button, true);
+
+            try {
+                const response = await fetch('/' + type, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ backend_url, user_id, message })
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    updateError(data.error);
+                    return;
+                }
+
+                renderData(type, data.result);
+            } catch (error) {
+                updateError(error.message || error);
+            } finally {
+                setLoading(button, false);
+            }
+        }
+
+        function setLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('loading');
+                button.dataset.savedText = button.innerText;
+                button.innerText = 'Processing...';
+            } else {
+                button.classList.remove('loading');
+                button.innerText = button.dataset.savedText || button.innerText;
+            }
+        }
+
+        function updateError(message) {
+            const section = document.getElementById('error_section');
+            const content = document.getElementById('error_content');
+            if (!message) {
+                section.classList.add('hidden');
+                content.innerText = '';
+                return;
+            }
+            section.classList.remove('hidden');
+            content.innerText = message;
+        }
+
+        function renderData(type, data) {
+            if (type === 'submit') {
+                renderRequest(data);
+            } else if (type === 'audit') {
+                renderAudit(data);
+            } else if (type === 'memory') {
+                renderMemory(data);
+            }
+        }
+
+        function renderRequest(data) {
+            const section = document.getElementById('request_section');
+            const content = document.getElementById('request_content');
+            section.classList.remove('hidden');
+
+            content.innerHTML = `
+                <div class="card-row">
+                    <div><span class="label">Intent</span><div class="value">${data.intent}</div></div>
+                    <div><span class="label">Confidence</span><div class="value">${(data.confidence * 100).toFixed(0)}%</div></div>
+                    <div><span class="label">Agent</span><div class="value">${data.agent_used}</div></div>
+                </div>
+                <div class="response-block">${data.response}</div>
+                <details>
+                    <summary>View raw request metadata</summary>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </details>
+            `;
+        }
+
+        function renderAudit(data) {
+            const section = document.getElementById('audit_section');
+            const content = document.getElementById('audit_content');
+            section.classList.remove('hidden');
+
+            if (!Array.isArray(data) || data.length === 0) {
+                content.innerHTML = '<p>No audit entries found.</p>';
+                return;
+            }
+
+            const rows = data.map(log => `
+                <tr>
+                    <td>${new Date(log.created_at).toLocaleString()}</td>
+                    <td><span class="badge">${log.intent}</span></td>
+                    <td>${(log.confidence * 100).toFixed(0)}%</td>
+                    <td>${log.agent}</td>
+                    <td><span class="badge badge-success">${log.status}</span></td>
+                </tr>
+            `).join('');
+
+            content.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>When</th>
+                            <th>Intent</th>
+                            <th>Confidence</th>
+                            <th>Agent</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        }
+
+        function renderMemory(data) {
+            const section = document.getElementById('memory_section');
+            const content = document.getElementById('memory_content');
+            section.classList.remove('hidden');
+
+            const stm = Array.isArray(data.short_term_memory) ? data.short_term_memory : (data.short_term_memory ? [data.short_term_memory] : []);
+            const stmHtml = stm.length > 0 ? `<ul>${stm.map(item => `<li>${item}</li>`).join('')}</ul>` : '<p>No recent session memory.</p>';
+
+            const ltmHtml = Array.isArray(data.long_term_memory) && data.long_term_memory.length > 0 ? data.long_term_memory.map(record => `
+                <div class="memory-card">
+                    <div class="memory-meta">${new Date(record.created_at).toLocaleString()} · Significance ${record.significance}</div>
+                    <div>${record.content}</div>
+                </div>
+            `).join('') : '<p>No long-term memories found.</p>';
+
+            content.innerHTML = `
+                <div class="memory-group">
+                    <h3>Short-Term Memory</h3>
+                    ${stmHtml}
+                </div>
+                <div class="memory-group">
+                    <h3>Long-Term Memory</h3>
+                    ${ltmHtml}
+                </div>
+            `;
+        }
+    </script>
 </body>
 </html>

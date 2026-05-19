@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+python-dotenv
+langgraph
+langchain
+langchain-openai
+httpx
+tenacity
+aiosqlite
+openai
+flask
+streamlit

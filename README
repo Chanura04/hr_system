@@ -1,0 +1,53 @@
+hr_multi_agent/
+│
+├── app/
+│   ├── main.py
+│   ├── config.py
+│   ├── database.py
+│   ├── schemas.py
+│   ├── exceptions.py
+│   ├── dependencies.py
+│   │
+│   ├── api/
+│   │   ├── routes.py
+│   │   └── health.py
+│   │
+│   ├── agents/
+│   │   ├── orchestrator.py
+│   │   ├── classifier.py
+│   │   ├── router.py
+│   │   ├── scheduling_agent.py
+│   │   ├── leave_agent.py
+│   │   ├── compliance_agent.py
+│   │   ├── clarification_agent.py
+│   │   └── base_agent.py
+│   │
+│   ├── memory/
+│   │   ├── stm.py
+│   │   ├── ltm.py
+│   │   ├── scorer.py
+│   │   └── manager.py
+│   │
+│   ├── audit/
+│   │   ├── logger.py
+│   │   └── models.py
+│   │
+│   ├── services/
+│   │   ├── llm_service.py
+│   │   ├── langgraph_flow.py
+│   │   └── retry.py
+│   │
+│   └── utils/
+│       ├── prompts.py
+│       ├── constants.py
+│       └── helpers.py
+│
+├── tests/
+│   ├── test_api.py
+│   ├── test_memory.py
+│   └── test_agents.py
+│
+├── .env
+├── requirements.txt
+├── README.md
+└── run.py

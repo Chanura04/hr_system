@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Multi-Agent Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="page">
+        <div class="hero">
+            <h1>HR Multi-Agent Interface</h1>
+            <p>Send requests to the HR automation backend, inspect audit history, and review memory using a simple Flask UI.</p>
+        </div>
+
+        <div class="card">
+            <form method="post" action="/submit">
+                <div class="grid">
+                    <div class="field">
+                        <label for="backend_url">Backend URL</label>
+                        <input id="backend_url" name="backend_url" type="text" value="{{ backend_url }}" placeholder="http://localhost:8000" />
+                    </div>
+                    <div class="field">
+                        <label for="user_id">User ID</label>
+                        <input id="user_id" name="user_id" type="text" value="{{ user_id }}" placeholder="user-123" />
+                    </div>
+                    <div class="field">
+                        <label for="message">Request Message</label>
+                        <textarea id="message" name="message" placeholder="I need to schedule a meeting with HR.">{{ message }}</textarea>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button class="primary" type="submit">Submit Request</button>
+                    <button class="secondary" type="submit" formaction="/audit">Load Audit Log</button>
+                    <button class="secondary" type="submit" formaction="/memory">Load User Memory</button>
+                </div>
+            </form>
+        </div>
+
+        {% if request_result %}
+        <div class="card">
+            <h2>Request Result</h2>
+            <div class="result">{{ request_result }}</div>
+        </div>
+        {% endif %}
+
+        {% if audit_result %}
+        <div class="card">
+            <h2>Audit Log</h2>
+            <div class="result">{{ audit_result }}</div>
+        </div>
+        {% endif %}
+
+        {% if memory_result %}
+        <div class="card">
+            <h2>User Memory</h2>
+            <div class="result">{{ memory_result }}</div>
+        </div>
+        {% endif %}
+
+        {% if error_message %}
+        <div class="card error-card">
+            <h2>Error</h2>
+            <div class="result">{{ error_message }}</div>
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            Run the backend first with <code>python run.py</code> then launch this page with <code>python flask_app.py</code>.
+        </div>
+    </div>
+</body>
+</html>

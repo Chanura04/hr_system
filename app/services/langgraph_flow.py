@@ -12,6 +12,7 @@ class GraphState(TypedDict):
     confidence: float
     response: str
     context: dict
+    history: list[str]
 
 
 classifier = IntentClassifier()
@@ -20,6 +21,7 @@ router = AgentRouter()
 
 def inject_context(state: GraphState):
     state["context"] = state.get("context", {})
+    state["history"] = state.get("history", [])
     return state
 
 
@@ -38,6 +40,8 @@ def route_node(state: GraphState):
     result = agent.handle(state["query"], state.get("context", {}))
 
     state["response"] = result
+    state["history"].append(f"User: {state['query']}")
+    state["history"].append(f"Assistant: {result}")
 
     return state
 

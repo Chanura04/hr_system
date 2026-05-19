@@ -25,7 +25,8 @@ class Orchestrator:
             "intent": "",
             "confidence": 0.0,
             "response": "",
-            "context": context
+            "context": context,
+            "history": context.get("short_term", [])
         }
 
         try:

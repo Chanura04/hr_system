@@ -44,13 +44,15 @@ class IntentClassifier:
         llm_intent, llm_confidence = self._llm_classification(clean_text)
         semantic_intent, semantic_similarity = self._semantic_match(clean_text)
 
-        # Relax threshold if LLM is highly confident or keywords are present
-        if semantic_similarity < 0.35 and llm_confidence < 0.8:
-            return "clarification", 0.40
+        if llm_intent in INTENT_DEFINITIONS and llm_confidence >= 0.35:
+            intent = llm_intent
+        else:
+            intent = semantic_intent
 
-        intent = self._select_intent(llm_intent, semantic_intent, semantic_similarity)
+        if llm_intent in INTENT_DEFINITIONS and llm_confidence < 0.4 and semantic_similarity >= 0.7:
+            intent = semantic_intent
+
         confidence = self._calibrate_confidence(llm_confidence, semantic_similarity, intent)
-
         return intent, confidence
 
     def _llm_classification(self, text: str) -> Tuple[str, float]:
@@ -61,13 +63,13 @@ class IntentClassifier:
                 {"role": "user", "content": prompt}
             ], temperature=0.0)
         except Exception:
-            return self._keyword_fallback(text)
+            return self._semantic_fallback(text)
 
         parsed = self._parse_response(raw_response)
         if parsed:
             return parsed["intent"], parsed["confidence"]
 
-        return self._keyword_fallback(text)
+        return self._semantic_fallback(text)
 
     def _build_prompt(self, text: str) -> str:
         intent_lines = "\n".join(
@@ -116,17 +118,6 @@ class IntentClassifier:
 
         return best_intent, round(best_score, 2)
 
-    def _select_intent(
-        self,
-        llm_intent: str,
-        semantic_intent: str,
-        semantic_similarity: float
-    ) -> str:
-        if semantic_intent != llm_intent and semantic_similarity >= 0.7:
-            return semantic_intent
-
-        return llm_intent if llm_intent in INTENT_DEFINITIONS else semantic_intent
-
     def _calibrate_confidence(
         self,
         llm_confidence: float,
@@ -139,13 +130,10 @@ class IntentClassifier:
 
         return round(max(0.5, min(base_confidence, 0.98)), 2)
 
-    def _keyword_fallback(self, text: str) -> Tuple[str, float]:
-        lower = text.lower()
-        if "meeting" in lower or "schedule" in lower:
-            return "scheduling", 0.60
-        if "leave" in lower or "vacation" in lower or "absent" in lower:
-            return "leave", 0.60
-        if "policy" in lower or "compliance" in lower or "training" in lower:
-            return "compliance", 0.60
+    def _semantic_fallback(self, text: str) -> Tuple[str, float]:
+        intent, similarity = self._semantic_match(text)
+        if intent == "clarification":
+            return "clarification", 0.40
 
-        return "clarification", 0.40
+        calibrated = max(0.35, min(similarity + 0.2, 0.75))
+        return intent, round(calibrated, 2)

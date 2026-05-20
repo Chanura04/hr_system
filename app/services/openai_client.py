@@ -3,6 +3,7 @@ from typing import Dict, List
 from openai import OpenAI
 
 from app.config import settings
+from app.services.retry import retryable
 
 
 class OpenAIClient:
@@ -16,10 +17,11 @@ class OpenAIClient:
             base_url=base_url
         )
         self.model = settings.MODEL_NAME or "gpt-4o-mini"
-        self.embedding_model = settings.EMBEDDING_MODEL_NAME or "text-embedding-3-small"
+        # self.embedding_model = settings.EMBEDDING_MODEL_NAME or "text-embedding-3-small"
 
     def chat(self, messages: List[Dict[str, str]], temperature: float = 0.0, max_tokens: int = 300) -> str:
-        response = self.client.chat.completions.create(
+        response = retryable(
+            self.client.chat.completions.create,
             model=self.model,
             messages=messages,
             temperature=temperature,
@@ -28,9 +30,9 @@ class OpenAIClient:
 
         return response.choices[0].message.content.strip()
 
-    def embed(self, text: str) -> List[float]:
-        response = self.client.embeddings.create(
-            model=self.embedding_model,
-            input=text
-        )
-        return response.data[0].embedding
+    # def embed(self, text: str) -> List[float]:
+    #     response = self.client.embeddings.create(
+    #         model=self.embedding_model,
+    #         input=text
+    #     )
+    #     return response.data[0].embedding

@@ -6,6 +6,11 @@ from app.services.langgraph_flow import build_graph
 
 
 class Orchestrator:
+    """
+    Its primary role is to manage the end-to-end lifecycle of a user request:
+    retrieving historical context, executing the LangGraph logic state machine, persisting new memories, 
+    and ensuring every interaction is logged for compliance and debugging.
+    """
 
     def __init__(self):
         self.graph = build_graph()
@@ -31,7 +36,7 @@ class Orchestrator:
 
         try:
             result = self.graph.invoke(initial_state)
-            self.memory_manager.store(db, user_id, message)
+            self.memory_manager.store(db, user_id, message ,result["intent"], result["confidence"]  )
 
             request_id = AuditLogger.append_log(
                 db=db,

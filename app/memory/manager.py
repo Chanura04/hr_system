@@ -14,12 +14,11 @@ class MemoryManager:
     def store(self, db: Session, user_id: str, message: str, intent: str, confidence: float):
         self.stm.add(user_id, message)
 
-        
         confidence_result = confidence
         intent_result = intent
         print(f"Intent: {intent_result}, confidence: {confidence_result}")
 
-        if confidence_result >= 0.5:
+        if confidence_result >= 0.6:
             LongTermMemory.add(
                 db,
                 user_id,

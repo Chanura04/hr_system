@@ -1,5 +1,35 @@
 # HR Multi-Agent Automation Platform
 
+
+[![Watch the video](C:\Github Repo\hr_system\DEMO_IMG.png)](https://youtu.be/-ThAYqCD7sM)
+
+
+---
+
+## Project Structure
+
+```text
+hr_system/
+├── app/
+│   ├── agents/             # Specialist agents, Orchestrator, and Classifier logic
+│   ├── api/                # REST API route definitions and health checks
+│   ├── audit/              # Append-only auditing system models and loggers
+│   ├── memory/             # Two-tier (STM/LTM) memory management and scoring
+│   ├── services/           # LLM clients, LangGraph workflow, and utility services
+│   ├── config.py           # Pydantic-based configuration management
+│   ├── database.py         # SQLAlchemy engine and session setup
+│   ├── main.py             # FastAPI application factory and error handlers
+│   └── schemas.py          # Pydantic models for requests and responses
+├── flask_app.py            # Flask frontend implementation
+├── streamlit_app.py        # Streamlit dashboard implementation
+├── run.py                  # Main entry point for the FastAPI server
+├── requirements.txt        # Project dependencies
+└── .env                    # Environment variables (API keys, DB paths)
+```
+
+---
+
+## Overview
 This project is a Python-based HR assistant engine built with FastAPI, Langgraph, SQLite, and LLM-based intent classification.
 
 ## Architecture
@@ -27,7 +57,7 @@ This project is a Python-based HR assistant engine built with FastAPI, Langgraph
 
 ## Deployment
 
-1. Copy or update `.env` with `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `MODEL_NAME`, `EMBEDDING_MODEL_NAME`, and `SQLITE_DB`.
+1. update `.env` with `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `MODEL_NAME`, and `SQLITE_DB`.
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
@@ -48,7 +78,7 @@ Optional: Start the Streamlit UI instead with:
 
 ## Notes
 
-- The intent classifier now uses an LLM plus embeddings for robust intent routing.
+- The intent classifier  uses an LLM plus embeddings for robust intent routing.
 - Low-confidence or out-of-scope requests are routed to the `ClarificationAgent`.
 - Raw Python stack traces are hidden from API clients via a global exception handler.
 - Audit logs are append-only, and memory reads are exposed through safe endpoints.

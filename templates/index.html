@@ -12,8 +12,7 @@
 <body>
     <div class="page">
         <div class="hero">
-            <h1>HR Multi-Agent Interface</h1>
-            <p>Send requests to the HR automation backend, inspect audit history, and review memory using a simple Flask UI.</p>
+            <h1>HR Multi-Agent System</h1>
         </div>
 
         <div class="card">
@@ -60,9 +59,7 @@
             </div>
         </div>
 
-        <div class="footer">
-            Run the backend first with <code>python run.py</code> then launch this page with <code>python flask_app.py</code>.
-        </div>
+       
     </div>
 
     <script>
@@ -160,6 +157,7 @@
             const rows = data.map(log => `
                 <tr>
                     <td>${new Date(log.created_at).toLocaleString()}</td>
+                    <td>${log.user_id}</td>
                     <td><span class="badge">${log.intent}</span></td>
                     <td>${(log.confidence * 100).toFixed(0)}%</td>
                     <td>${log.agent}</td>
@@ -172,6 +170,7 @@
                     <thead>
                         <tr>
                             <th>When</th>
+                            <th>User ID</th>
                             <th>Intent</th>
                             <th>Confidence</th>
                             <th>Agent</th>

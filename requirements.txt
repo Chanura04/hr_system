@@ -11,5 +11,6 @@ httpx
 tenacity
 aiosqlite
 openai
+sentence-transformers
 flask
 streamlit

@@ -11,7 +11,10 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.APP_NAME)
 
-
+"""
+Global Exception Handling: A catch-all handler to ensure that unexpected errors are 
+logged and a generic error message is returned to the client, preventing exposure of internal server details.
+"""
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     if isinstance(exc, HTTPException):

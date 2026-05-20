@@ -15,4 +15,11 @@ class AgentRouter:
         }
 
     def get_agent(self, intent: str):
+
+        '''
+            if the intent is not recognized, we can return a clarification agent that will ask the
+            user for more details. This way we can handle out-of-scope queries gracefully and also have 
+            a chance to route them correctly if the user provides more information.
+        '''
+
         return self.agents.get(intent, ClarificationAgent())

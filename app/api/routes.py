@@ -1,3 +1,5 @@
+
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
@@ -8,12 +10,16 @@ from app.agents.orchestrator import Orchestrator
 from app.audit.models import AuditLog
 from app.memory.ltm import LongTermMemoryRecord
 
+"""
+This  defines the RESTful endpoints for the application, acting as the interface between 
+the HTTP layer and the core logic. 
+"""
 
 router = APIRouter()
 
 orchestrator = Orchestrator()
 
-
+"""Request Routing: Passing user messages to the Orchestrator for processing."""
 @router.post("/request", response_model=AgentResponse)
 def process_request(payload: RequestPayload, db: Session = Depends(get_db)):
     try:
@@ -29,6 +35,7 @@ def process_request(payload: RequestPayload, db: Session = Depends(get_db)):
         )
 
 
+"""Audit Observability: Providing read access to the transaction logs."""
 @router.get("/audit")
 def get_audits(db: Session = Depends(get_db)):
     logs = db.query(AuditLog).order_by(AuditLog.created_at.desc()).all()
@@ -45,7 +52,7 @@ def get_audits(db: Session = Depends(get_db)):
         for log in logs
     ]
 
-
+"""Memory Inspection: Endpoints to view and manage user-specific short-term and long-term memory."""
 @router.get("/memory/{user_id}")
 def get_memory(user_id: str, db: Session = Depends(get_db)):
     # Retrieve STM from the volatile storage
@@ -74,6 +81,10 @@ def clear_memory(user_id: str, db: Session = Depends(get_db)):
     records = db.query(LongTermMemoryRecord).filter(
         LongTermMemoryRecord.user_id == user_id
     )
+
+    # Also clear volatile Short-Term Memory
+    if user_id in orchestrator.memory_manager.stm.memory:
+        del orchestrator.memory_manager.stm.memory[user_id]
 
     deleted = records.delete()
     db.commit()

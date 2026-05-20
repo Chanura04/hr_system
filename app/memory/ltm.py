@@ -3,6 +3,8 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.orm import Session
 
+from zoneinfo import ZoneInfo
+
 from app.database import Base
 
 
@@ -13,7 +15,12 @@ class LongTermMemoryRecord(Base):
     user_id = Column(String)
     content = Column(String)
     significance = Column(Float)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(ZoneInfo("Asia/Colombo"))
+    )
+
 
 
 class LongTermMemory:

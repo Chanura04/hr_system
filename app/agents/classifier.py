@@ -28,6 +28,12 @@ INTENT_DEFINITIONS: Dict[str, str] = {
 
 
 class IntentClassifier:
+    """
+    A hybrid intent classifier that combines the understanding of a Large Language Model (LLM)
+    with the semantic similarity (vector embeddings).
+    This approach aims to leverage the strengths of both methods for accurate and resilient intent classification,
+    especially in cases of low LLM confidence or LLM failures.
+    """
 
     def __init__(self):
         self.llm = OpenAIClient()
@@ -55,13 +61,18 @@ class IntentClassifier:
         # print(f"LLM intent: {llm_intent} (confidence: {llm_confidence}), "
         #       f"Semantic intent: {semantic_intent} (similarity: {semantic_similarity})")
 
-        #if LLM conidence is enough and it intent is valid, use it. Otherwise, fallback to semantic intent
+        '''
+              if LLM conidence is enough and it intent is valid, use it. Otherwise, fallback to semantic intent
+        '''
         if llm_intent in INTENT_DEFINITIONS and llm_confidence >= 0.35:
             intent = llm_intent
         else:
             intent = semantic_intent
 
-        # Handle the LLm 'Hallucination' case - when LLM confidence is low but it predicts a valid intent, we can check semantic similarity to validate it
+        '''
+        Handle the LLm 'Hallucination' case - when LLM confidence is low but it predicts a valid intent, 
+        that can check semantic similarity to validate it
+        '''
         if llm_intent in INTENT_DEFINITIONS and llm_confidence < 0.4 and semantic_similarity >= 0.7:
             intent = semantic_intent
 

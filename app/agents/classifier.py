@@ -51,8 +51,9 @@ class IntentClassifier:
         clean_text = text.strip()
         llm_intent, llm_confidence = self._llm_classification(clean_text)
         semantic_intent, semantic_similarity = self._semantic_match(clean_text)
-        print(f"LLM intent: {llm_intent} (confidence: {llm_confidence}), "
-              f"Semantic intent: {semantic_intent} (similarity: {semantic_similarity})")
+
+        # print(f"LLM intent: {llm_intent} (confidence: {llm_confidence}), "
+        #       f"Semantic intent: {semantic_intent} (similarity: {semantic_similarity})")
 
         #if LLM conidence is enough and it intent is valid, use it. Otherwise, fallback to semantic intent
         if llm_intent in INTENT_DEFINITIONS and llm_confidence >= 0.35:

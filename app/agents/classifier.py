@@ -2,7 +2,9 @@ import json
 import re
 from typing import Dict, List, Tuple
 
-from app.services.embedding_service import EmbeddingService
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
 from app.services.openai_client import OpenAIClient
 
 
@@ -29,30 +31,41 @@ class IntentClassifier:
 
     def __init__(self):
         self.llm = OpenAIClient()
-        self.embedding_service = EmbeddingService()
-        self.intent_embeddings: Dict[str, List[float]] = {}
+        self.semantic_model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.intent_embeddings: Dict[str, np.ndarray] = {}
+        
 
     def _ensure_intent_embeddings(self) -> None:
         if self.intent_embeddings:
             return
 
         for intent, description in INTENT_DEFINITIONS.items():
-            self.intent_embeddings[intent] = self.embedding_service.embed(description)
+            embedding = self.semantic_model.encode(
+                description,
+                convert_to_numpy=True,
+                normalize_embeddings=True
+            )
+            self.intent_embeddings[intent] = embedding
 
     def classify(self, text: str) -> Tuple[str, float]:
         clean_text = text.strip()
         llm_intent, llm_confidence = self._llm_classification(clean_text)
         semantic_intent, semantic_similarity = self._semantic_match(clean_text)
+        print(f"LLM intent: {llm_intent} (confidence: {llm_confidence}), "
+              f"Semantic intent: {semantic_intent} (similarity: {semantic_similarity})")
 
+        #if LLM conidence is enough and it intent is valid, use it. Otherwise, fallback to semantic intent
         if llm_intent in INTENT_DEFINITIONS and llm_confidence >= 0.35:
             intent = llm_intent
         else:
             intent = semantic_intent
 
+        # Handle the LLm 'Hallucination' case - when LLM confidence is low but it predicts a valid intent, we can check semantic similarity to validate it
         if llm_intent in INTENT_DEFINITIONS and llm_confidence < 0.4 and semantic_similarity >= 0.7:
             intent = semantic_intent
 
-        confidence = self._calibrate_confidence(llm_confidence, semantic_similarity, intent)
+        confidence = self.calibrate_confidence(llm_confidence, semantic_similarity, intent)
+
         return intent, confidence
 
     def _llm_classification(self, text: str) -> Tuple[str, float]:
@@ -106,19 +119,23 @@ class IntentClassifier:
 
     def _semantic_match(self, text: str) -> Tuple[str, float]:
         self._ensure_intent_embeddings()
-        request_embedding = self.embedding_service.embed(text)
+        request_embedding = self.semantic_model.encode(
+            text,
+            convert_to_numpy=True,
+            normalize_embeddings=True
+        )
+
         best_intent = "clarification"
         best_score = 0.0
-
         for intent, intent_embedding in self.intent_embeddings.items():
-            score = self.embedding_service.cosine_similarity(request_embedding, intent_embedding)
+            score = float(np.dot(request_embedding, intent_embedding))
             if score > best_score:
                 best_score = score
                 best_intent = intent
 
         return best_intent, round(best_score, 2)
 
-    def _calibrate_confidence(
+    def calibrate_confidence(
         self,
         llm_confidence: float,
         semantic_similarity: float,
@@ -130,6 +147,9 @@ class IntentClassifier:
 
         return round(max(0.5, min(base_confidence, 0.98)), 2)
 
+    '''
+    Backup fallback when LLM fails to respond or parse - we can still provide a guess based on semantic similarity
+    '''
     def _semantic_fallback(self, text: str) -> Tuple[str, float]:
         intent, similarity = self._semantic_match(text)
         if intent == "clarification":

@@ -37,7 +37,7 @@ def classify_node(state: GraphState):
 def route_node(state: GraphState):
     agent = router.get_agent(state["intent"])
 
-    result = agent.handle(state["query"], state.get("context", {}))
+    result = agent.handle(state["query"], state.get("history", {}))
 
     state["response"] = result
     state["history"].append(f"User: {state['query']}")

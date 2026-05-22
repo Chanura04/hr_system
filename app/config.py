@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     MODEL_NAME: str
     EMBEDDING_MODEL_NAME: str = "text-embedding-3-small"
 
+    GOOGLE_CREDENTIALS_PATH: str = "C:\\Github Repo\\hr_system\\app\\credentials.json"
+    GOOGLE_TOKEN_PATH: str = "C:\\Github Repo\\hr_system\\app\\token.json"
+
     SQLITE_DB: str
 
     REQUEST_TIMEOUT: int = 30

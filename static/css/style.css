@@ -50,7 +50,7 @@ label {
 }
 
 input[type=text], textarea {
-    width: 100%;
+    width: 95%;
     border: 1px solid #cbd5e1;
     border-radius: 14px;
     padding: 14px 16px;

@@ -7,6 +7,16 @@
 
 ---
 
+
+## System Architecture
+
+![Logo](diagram.png)
+
+
+
+
+
+
 ## Project Structure
 
 ```text

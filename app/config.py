@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     DEBUG: bool
 
     OPENAI_API_KEY: str
+    OPENAI_API_KEY_2: str
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     MODEL_NAME: str
     EMBEDDING_MODEL_NAME: str = "text-embedding-3-small"

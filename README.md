@@ -1,8 +1,9 @@
 # HR Multi-Agent Automation Platform
+---
 
+### System Demostration
 
-[![Watch the video](C:\Github Repo\hr_system\DEMO_IMG.png)](https://youtu.be/-ThAYqCD7sM)
-
+[![Watch the video](DEMO_IMG.png)](https://youtu.be/-ThAYqCD7sM)
 
 ---
 

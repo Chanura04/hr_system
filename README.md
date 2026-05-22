@@ -41,7 +41,7 @@ hr_system/
 ---
 
 ## Overview
-This project is a Python-based HR assistant engine built with FastAPI, Langgraph, SQLite, and LLM-based intent classification.
+This project builds an HR automation backend using an agent-based workflow that processes user requests step by step. First, when a user submits a query, the system loads relevant context by retrieving both recent activity (short-term memory) and stored historical data (long-term memory). Next, it identifies what the user wants through an intent detection stage that combines large language models and semantic matching for accurate classification. Based on this intent, the system routes the request to a specialized agent, such as scheduling, leave management, or compliance, which handles the task and generates a response. Finally, the system completes the process by saving updates to the user’s memory and recording the entire interaction in a secure audit log, ensuring traceability before returning the final answer to the user.
 
 ## Architecture
 
@@ -82,10 +82,7 @@ This project is a Python-based HR assistant engine built with FastAPI, Langgraph
    python flask_app.py
    ```
 
-Optional: Start the Streamlit UI instead with:
-   ```bash
-   streamlit run streamlit_app.py
-   ```
+
 
 ## Notes
 

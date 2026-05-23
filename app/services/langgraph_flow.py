@@ -36,8 +36,16 @@ def classify_node(state: GraphState):
 
 def route_node(state: GraphState):
     agent = router.get_agent(state["intent"])
+    context = state.get("context", {})
 
-    result = agent.handle(state["query"], state.get("history", {}))
+    print(
+        f"\nRouting {state['intent']} -> {agent.__class__.__name__}: "
+        f"context_keys={list(context.keys())}, "
+        f"short_term={context.get('short_term')}, "
+        f"long_term_count={len(context.get('long_term', [])) if isinstance(context.get('long_term'), list) else 'n/a'}"
+    )
+
+    result = agent.handle(state["query"], context)
 
     state["response"] = result
     state["history"].append(f"User: {state['query']}")

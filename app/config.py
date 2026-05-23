@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
     APP_NAME: str
     APP_ENV: str
@@ -8,7 +7,7 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str
     OPENAI_API_KEY_2: str
-    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    OPENAI_BASE_URL: str = "https://integrate.api.nvidia.com/v1"
     MODEL_NAME: str
     EMBEDDING_MODEL_NAME: str = "text-embedding-3-small"
 

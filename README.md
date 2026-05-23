@@ -3,7 +3,7 @@
 
 ### System Demostration
 
-[![Watch the video](DEMO_IMG.png)](https://youtu.be/-ThAYqCD7sM)
+[![Watch the video](DEMO_IMG.png)](https://youtu.be/0sCqnCXkEkM)
 
 ---
 

@@ -33,6 +33,7 @@ class Orchestrator:
             "context": context,
             "history": context.get("short_term", [])
         }
+        # print(f"Orchestrator: Retrieved context for user {user_id}: { context.get("short_term", [])}")
 
         try:
             result = self.graph.invoke(initial_state)

@@ -7,12 +7,15 @@ app.config["SECRET_KEY"] = "replace-with-your-secret"
 TEMPLATE_NAME = "index.html"
 
 
+import httpx
+
 def fetch_json(endpoint: str, payload=None):
+    timeout = httpx.Timeout(180.0)
     try:
         if payload is None:
-            response = httpx.get(endpoint, timeout=30.0)
+            response = httpx.get(endpoint, timeout=timeout)
         else:
-            response = httpx.post(endpoint, json=payload, timeout=30.0)
+            response = httpx.post(endpoint, json=payload, timeout=timeout)
 
         response.raise_for_status()
         return response.json(), None

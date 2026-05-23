@@ -16,22 +16,30 @@ class OpenAIClient:
         self.client = OpenAI(
             api_key=settings.OPENAI_API_KEY,
             base_url=base_url,
-            timeout=20.0,
+            timeout=120.0,
         )
         self.model = settings.MODEL_NAME or "gpt-4o-mini"
         # self.embedding_model = settings.EMBEDDING_MODEL_NAME or "text-embedding-3-small"
 
     def chat(self, messages: List[Dict[str, str]], temperature: float = 0.0, max_tokens: int = 300) -> str:
         try:
-            response = retryable(
-                self.client.chat.completions.create,
+            # response = retryable(
+            #     self.client.chat.completions.create,
+            #     model=self.model,
+            #     messages=messages,
+            #     temperature=temperature,
+            #     max_tokens=max_tokens,
+            #     timeout=20.0,
+            # )
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                timeout=20.0,
+                timeout=120.0,
             )
         except Exception as e:
+            print("OpenAIClient_2.chat error:", type(e).__name__, str(e))
             msg = str(e).lower()
             if "timed out" in msg or "timeout" in msg or isinstance(e, TimeoutError):
                 raise TimeoutError("LLM request timed out") from e
@@ -57,21 +65,21 @@ class OpenAIClient:
 #         self.client = OpenAI(
 #             api_key=api_key,
 #             base_url=base_url,
-#             timeout=20.0,
+#             timeout=120.0,
 #         )
 #         self.model = settings.MODEL_NAME or "gpt-4o-mini"
 #         # self.embedding_model = settings.EMBEDDING_MODEL_NAME or "text-embedding-3-small"
 
 #     def chat(self, messages: List[Dict[str, str]], temperature: float = 0.0, max_tokens: int = 300) -> str:
 #         try:
-#             response = retryable(
-#                 self.client.chat.completions.create,
+#             response = self.client.chat.completions.create(
 #                 model=self.model,
 #                 messages=messages,
 #                 temperature=temperature,
-#                 max_tokens=max_tokens,
-#                 timeout=20.0,
-#             )
+#                 max_tokens=max_tokens,   
+#                                           timeout=120.0,
+#                 )
+            
 #         except Exception as e:
 #             msg = str(e).lower()
 #             if "timed out" in msg or "timeout" in msg or isinstance(e, TimeoutError):

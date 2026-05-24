@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
     <div class="page">
@@ -17,9 +17,9 @@
 
         <div class="card">
             <div class="grid">
-                <div class="field">
+                <div class="field" style="display:none;">
                     <label for="backend_url">Backend URL</label>
-                    <input id="backend_url" name="backend_url" type="text" value="{{ backend_url }}" placeholder="http://localhost:8000" />
+                    <input id="backend_url" name="backend_url" type="text" value="" placeholder="http://localhost:8000" />
                 </div>
                 <div class="field">
                     <label for="user_id">User ID</label>
@@ -72,19 +72,23 @@
             setLoading(button, true);
 
             try {
-                const response = await fetch('/' + type, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ backend_url, user_id, message })
-                });
-                const data = await response.json();
-
-                if (data.error) {
-                    updateError(data.error);
-                    return;
+                let data;
+                if (type === 'submit') {
+                    const resp = await fetch('/request', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id, message })
+                    });
+                    data = await resp.json();
+                } else if (type === 'audit') {
+                    const resp = await fetch('/audit');
+                    data = await resp.json();
+                } else if (type === 'memory') {
+                    const resp = await fetch(`/memory/${encodeURIComponent(user_id)}`);
+                    data = await resp.json();
                 }
 
-                renderData(type, data.result);
+                renderData(type, data);
             } catch (error) {
                 updateError(error.message || error);
             } finally {

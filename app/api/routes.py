@@ -11,8 +11,6 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal, get_db
 from app.schemas import (
     AgentResponse,
-    BackgroundJobResponse,
-    BackgroundRequestStatus,
     RequestPayload,
 )
 from app.agents.orchestrator import Orchestrator
@@ -31,20 +29,7 @@ background_jobs: Dict[str, dict] = {}
 background_jobs_lock = Lock()
 
 
-def _get_background_job(job_id: str) -> dict | None:
-    with background_jobs_lock:
-        return background_jobs.get(job_id)
 
-
-def _set_background_job(job_id: str, payload: dict) -> None:
-    with background_jobs_lock:
-        background_jobs[job_id] = payload
-
-
-def _update_background_job(job_id: str, updates: dict) -> None:
-    with background_jobs_lock:
-        if job_id in background_jobs:
-            background_jobs[job_id].update(updates)
 
 
 """Request Routing: Passing user messages to the Orchestrator for processing."""
@@ -63,52 +48,6 @@ def process_request(payload: RequestPayload, db: Session = Depends(get_db)):
         )
 
 
-def _process_background_request(job_id: str, user_id: str, message: str) -> None:
-    db = SessionLocal()
-    try:
-        _update_background_job(job_id, {"status": "processing"})
-        result = orchestrator.process(db, user_id, message)
-        _update_background_job(job_id, {"status": "completed", "result": result})
-    except Exception as exc:
-        _update_background_job(job_id, {"status": "failed", "error": str(exc)})
-    finally:
-        db.close()
-
-
-@router.post("/request/background", response_model=BackgroundJobResponse)
-def submit_background_request(
-    payload: RequestPayload,
-    background_tasks: BackgroundTasks
-):
-    job_id = str(uuid.uuid4())
-    _set_background_job(job_id, {
-        "job_id": job_id,
-        "status": "pending",
-        "result": None,
-        "error": None,
-    })
-    background_tasks.add_task(
-        _process_background_request,
-        job_id,
-        payload.user_id,
-        payload.message,
-    )
-
-    return {"job_id": job_id, "status": "pending"}
-
-
-@router.get("/request/status/{job_id}", response_model=BackgroundRequestStatus)
-def get_background_request_status(job_id: str):
-    job = _get_background_job(job_id)
-    if job is None:
-        raise HTTPException(status_code=404, detail="Background request not found.")
-
-    return {
-        "job_id": job_id,
-        "status": job["status"],
-        "result": job.get("result"),
-        "error": job.get("error"),
-    }
 
 
 """Audit Observability: Providing read access to the transaction logs."""

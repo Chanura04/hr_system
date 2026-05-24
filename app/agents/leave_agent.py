@@ -38,7 +38,7 @@ class LeaveAgent(BaseAgent):
         3. Approval Status
         User: "What's the status of my leave request?"
         Assistant:
-        "Your leave request for May 25–26 is currently awaiting manager approval."
+        "Your leave request for May 25-26 is currently awaiting manager approval."
 
         4. Missing Information
         User: "Apply leave."

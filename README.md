@@ -31,7 +31,7 @@ hr_system/
 │   ├── database.py         # SQLAlchemy engine and session setup
 │   ├── main.py             # FastAPI application factory and error handlers
 │   └── schemas.py          # Pydantic models for requests and responses
-├── flask_app.py            # Flask frontend implementation
+├── (frontend served by FastAPI)  # Single FastAPI app serves UI and API
 ├── streamlit_app.py        # Streamlit dashboard implementation
 ├── run.py                  # Main entry point for the FastAPI server
 ├── requirements.txt        # Project dependencies
@@ -55,8 +55,8 @@ This project builds an HR automation backend using an agent-based workflow that 
 - `app/audit/` - Append-only audit logger and storage.
 - `app/services/openai_client.py` - OpenAI SDK client for chat completions and embeddings using configured base URL.
 - `app/services/embedding_service.py` - Semantic similarity utilities.
-- `flask_app.py` - Simple Flask UI for submitting requests, viewing audit logs, and checking user memory.
-- `streamlit_app.py` - Optional Streamlit UI for browser interaction with the FastAPI backend.
+ - (frontend served by FastAPI) - The FastAPI app serves the browser UI at `/`.
+ - `streamlit_app.py` - Optional Streamlit UI for browser interaction with the FastAPI backend.
 
 ## API Endpoints
 
@@ -73,13 +73,9 @@ This project builds an HR automation backend using an agent-based workflow that 
    ```bash
    pip install -r requirements.txt
    ```
-3. Start the FastAPI service:
+3. Start the FastAPI service (serves both UI and API):
    ```bash
    python run.py
-   ```
-4. Start the Flask UI in a separate terminal:
-   ```bash
-   python flask_app.py
    ```
 
 

@@ -16,16 +16,6 @@ class AgentResponse(BaseModel):
     context_used: Optional[dict]
 
 
-class BackgroundJobResponse(BaseModel):
-    job_id: str
-    status: str
-
-
-class BackgroundRequestStatus(BaseModel):
-    job_id: str
-    status: str
-    result: Optional[AgentResponse] = None
-    error: Optional[str] = None
 
 
 class AuditRecord(BaseModel):

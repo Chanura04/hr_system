@@ -1,3 +1,8 @@
 .env
-.db
 .json
+/app/__pycache__
+/app/database/__pycache__
+/app/agents/__pycache__
+/app/api/__pycache__
+/app/memory/__pycache__
+*.db

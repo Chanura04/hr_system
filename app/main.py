@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from app.config import settings
 from app.database import Base, engine
@@ -10,6 +12,22 @@ from app.api.health import health_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.APP_NAME)
+
+# Mount static files and templates so FastAPI can serve the frontend
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "user_id": "user-123",
+            "message": "Please schedule a meeting with my manager.",
+        },
+    )
 
 """
 Global Exception Handling: A catch-all handler to ensure that unexpected errors are 
